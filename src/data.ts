@@ -1,7 +1,8 @@
-import PricingItem from "./typing/PricingItem";
+import { Category } from "./typing/Category";
 
-export const items: PricingItem[] = [
+export const categories: Category[] = [
   {
+    id: "1c",
     title: "Extraordinário",
     description: "Comum",
     frequency: [
@@ -12,6 +13,7 @@ export const items: PricingItem[] = [
     ],
   },
   {
+    id: "2c",
     title: "Biológico",
     description: "Infectante",
     frequency: [
@@ -21,8 +23,19 @@ export const items: PricingItem[] = [
     ],
   },
   {
+    id: "3c",
     title: "Químico",
     description: "Perigosos",
+    frequency: [
+      { text: "Semanal", css: "weekly" },
+      { text: "Mensal", css: "monthly" },
+      { text: "Eventual", css: "eventually" },
+    ],
+  },
+  {
+    id: "4c",
+    title: "Reciclável",
+    description: "Reciclável",
     frequency: [
       { text: "Semanal", css: "weekly" },
       { text: "Mensal", css: "monthly" },
@@ -90,29 +103,73 @@ export const routeNames: { path: string; label: string }[] = [
   },
 ];
 
-export const categories: { value: string; label: string }[] = [
+export const components: {
+  title: string;
+  href: string;
+  description: string;
+}[] = [
   {
-    value: "next.js",
-    label: "Next.js",
+    title: "Extraordinário",
+    href: "#",
+    description:
+      "Este tipo de coleta é geralmente destinado a resíduos que não se enquadram nas categorias regulares de coleta. Pode incluir itens de grande volume ou resíduos gerados por eventos especiais que requerem atenção especial para o descarte.",
   },
   {
-    value: "sveltekit",
-    label: "SvelteKit",
+    title: "Biológico",
+    href: "#",
+    description:
+      "Refere-se à coleta de resíduos que têm origem biológica, como restos de alimentos, folhas, caules, sementes, papéis usados, dejetos humanos, entre outros.",
   },
   {
-    value: "nuxt.js",
-    label: "Nuxt.js",
-  },
-  {
-    value: "remix",
-    label: "Remix",
-  },
-  {
-    value: "astro",
-    label: "Astro",
+    title: "Químico",
+    href: "#",
+    description:
+      "Esses resíduos precisam de um tratamento especial para evitar a contaminação do meio ambiente e riscos à saúde pública. Normalmente, são incluídos na categoria de resíduos perigosos e podem ser identificados pela cor laranja em sistemas de coleta seletiva",
   },
 ];
 
-export const tracks: string[] = ["A", "B", "C"];
+export const tracks: { id: string; name: string }[] = [
+  {
+    id: "1f",
+    name: "A",
+  },
+  {
+    id: "2f",
+    name: "B",
+  },
+  {
+    id: "3f",
+    name: "C",
+  },
+  {
+    id: "4f",
+    name: "D",
+  },
+  {
+    id: "5f",
+    name: "Zona Sul",
+  },
+  {
+    id: "6f",
+    name: "Zona Norte",
+  },
+  {
+    id: "7f",
+    name: "Barra",
+  },
+  {
+    id: "8f",
+    name: "Freguesia",
+  },
+];
 
-export const status: string[] = ["active", "inactive"];
+export const status: { name: string; title: string }[] = [
+  {
+    name: "active",
+    title: "Ativo",
+  },
+  {
+    name: "inactive",
+    title: "Inativo",
+  },
+];

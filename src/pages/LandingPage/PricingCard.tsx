@@ -8,10 +8,10 @@ import {
 } from "@/components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
-import PricingItem from "@/typing/PricingItem";
+import { Category } from "@/typing/Category";
 
 type PricingCardProps = {
-  item: PricingItem;
+  item: Category;
 };
 
 export default function PricingCard({
@@ -27,7 +27,7 @@ export default function PricingCard({
         <h2>Frequências de coletas disponíveis:</h2>
         <div className="flex flex-wrap gap-2 mt-4">
           {frequency.map((freq) => (
-            <Badge variant={freq.css}>{freq.text}</Badge>
+            <Badge key={freq.text} variant={freq.css}>{freq.text}</Badge>
           ))}
         </div>
       </CardContent>

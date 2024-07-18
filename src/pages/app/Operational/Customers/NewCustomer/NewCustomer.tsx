@@ -13,14 +13,24 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+
+import { categories } from "@/data";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   email: z.string().email().min(1, "Campo obrigatório"),
   name: z.string().min(1, "Campo obrigatório"),
   address: z.string().min(1, "Campo obrigatório"),
-  category: z.string().min(1, "Campo obrigatório"),
+  category: z.array(z.string()).min(1, "Campo obrigatório"),
   route: z.string(),
-  // i need to create a status, all customer will be created as active? or i will give the option to create as inactive?
+  status: z.enum(["active", "inactive"]),
 });
 
 type FormFields = z.infer<typeof formSchema>;
@@ -32,14 +42,23 @@ export default function NewCustomer() {
       email: "",
       name: "",
       address: "",
-      category: "",
+      category: [],
       route: "",
+      status: "inactive",
     },
   });
 
-  const onSubmit: SubmitHandler<FormFields> = async (data) => {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    console.log(data);
+  const onSubmit: SubmitHandler<FormFields> = (data) => {
+    fetch("http://localhost:3000/customers", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((res) => res.json())
+      .then((data) => console.log(data))
+      .catch((error) => console.log(error));
   };
 
   return (
@@ -103,13 +122,32 @@ export default function NewCustomer() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Finalidade(s)</FormLabel>
-              <FormControl>
-                <Input {...field} type="text" />
-              </FormControl>
-              <FormMessage />
               <FormDescription>
                 Esse campo pode ter mais de um valor
               </FormDescription>
+              {categories.map((category) => (
+                <FormItem
+                  key={category.id}
+                  className="flex space-x-3 space-y-0"
+                >
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value.includes(category.title)}
+                      onCheckedChange={(checked) => {
+                        checked
+                          ? field.onChange([...field.value, category.title])
+                          : field.onChange(
+                              field.value.filter(
+                                (value) => value !== category.title
+                              )
+                            );
+                      }}
+                    />
+                  </FormControl>
+                  <FormLabel>{category.title}</FormLabel>
+                </FormItem>
+              ))}
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -130,7 +168,27 @@ export default function NewCustomer() {
             </FormItem>
           )}
         />
-        <Button variant={"secondary"} type="reset">
+        <FormField
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Status</FormLabel>
+              <FormControl>
+                <Select onValueChange={field.onChange}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Active">Ativo</SelectItem>
+                    <SelectItem value="Inactive">Inativo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <Button variant={"secondary"} type="reset" className="col-start-1">
           Limpar
         </Button>
         <Button

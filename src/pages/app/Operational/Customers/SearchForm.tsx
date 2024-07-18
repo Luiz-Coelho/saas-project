@@ -12,33 +12,81 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import StatusSelect from "@/components/StatusSelect";
-import { categories } from "@/data";
+import { categories, status, tracks } from "@/data";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 
 const formSchema = z.object({
+  email: z.string(),
   name: z.string(),
   address: z.string(),
-  category: z.string(),
-  route: z.string(),
-  status: z.enum(["active", "inactive", "all"]),
-  // i need to create a status, all customer will be created as active? or i will give the option to create as inactive?
+  category: z.array(z.string()),
+  track: z.array(z.string()),
+  status: z.array(z.string()),
 });
 
 type FormFields = z.infer<typeof formSchema>;
 
 export default function SearchForm() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const form = useForm<FormFields>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      email: "",
       name: "",
       address: "",
-      category: "",
-      route: "",
-      status: "all",
+      category: [],
+      track: [],
+      status: [],
     },
   });
 
+  useEffect(() => {
+    if (searchParams) {
+      const params = {
+        email: searchParams.get("email") || "",
+        name: searchParams.get("name") || "",
+        address: searchParams.get("address") || "",
+        category: searchParams.getAll("category") || [],
+        track: searchParams.getAll("track") || [],
+        status: searchParams.getAll("status") || [],
+      };
+
+      form.reset(params);
+    }
+  }, []);
+
+  useEffect(() => {
+    const subscription = form.watch((data) => {
+      mapEntries(data);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form.watch, searchParams]);
+
+  function mapEntries(data: FormFields) {
+    const params = new URLSearchParams();
+
+    Object.entries(data).forEach(([key, value]) => {
+      Array.isArray(value)
+        ? value.forEach((value) => params.append(key, value))
+        : params.append(key, value);
+    });
+
+    setSearchParams(params);
+  }
+
   const onSubmit: SubmitHandler<FormFields> = (data) => {
+    mapEntries(data);
     console.log(data);
   };
 
@@ -46,8 +94,21 @@ export default function SearchForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid grid-cols-4 gap-6 "
+        className="grid grid-cols-3 gap-y-6 gap-x-10 max-w-screen-xl mx-auto"
       >
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>E-mail</FormLabel>
+              <FormControl>
+                <Input {...field} type="text" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="name"
@@ -65,7 +126,7 @@ export default function SearchForm() {
           control={form.control}
           name="address"
           render={({ field }) => (
-            <FormItem className="col-span-2">
+            <FormItem>
               <FormLabel>Endereço</FormLabel>
               <FormControl>
                 <Input {...field} type="text" />
@@ -76,28 +137,104 @@ export default function SearchForm() {
         />
         <FormField
           control={form.control}
-          name="category"
+          name="track"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Finalidade(s)</FormLabel>
-              <FormControl>
-                {/* Make it as a dropdown */}
-                <Input {...field} type="text" />
-              </FormControl>
+              <FormLabel>Rota(s)</FormLabel>
+              <FormItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant={"outline"}>Escolher rotas</Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel>Rotas</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuCheckboxItem
+                      checked={field.value.length === tracks.length}
+                      onCheckedChange={(checked) => {
+                        checked
+                          ? field.onChange(tracks.map((track) => track.id))
+                          : field.onChange([]);
+                      }}
+                    >
+                      Todas
+                    </DropdownMenuCheckboxItem>
+                    {tracks.map((track) => (
+                      <FormItem key={track.id}>
+                        <FormControl>
+                          <DropdownMenuCheckboxItem
+                            checked={field.value.includes(track.id)}
+                            onCheckedChange={(checked) => {
+                              checked
+                                ? field.onChange([...field.value, track.id])
+                                : field.onChange(
+                                    field.value.filter(
+                                      (value) => value !== track.id
+                                    )
+                                  );
+                            }}
+                          >
+                            {track.name}
+                          </DropdownMenuCheckboxItem>
+                        </FormControl>
+                      </FormItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </FormItem>
               <FormMessage />
             </FormItem>
           )}
         />
         <FormField
           control={form.control}
-          name="route"
+          name="category"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Rota(s)</FormLabel>
-              <FormControl>
-                {/* Make it as a dropdown */}
-                <Input {...field} type="text" />
-              </FormControl>
+              <FormLabel>Finalidade(s)</FormLabel>
+              <FormItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant={"outline"}>Escolher finalidade(s)</Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel>Finalidades</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuCheckboxItem
+                      checked={field.value.length === categories.length}
+                      onCheckedChange={(checked) => {
+                        checked
+                          ? field.onChange(
+                              categories.map((category) => category.id)
+                            )
+                          : field.onChange([]);
+                      }}
+                    >
+                      Todas
+                    </DropdownMenuCheckboxItem>
+                    {categories.map((category) => (
+                      <FormItem key={category.id}>
+                        <FormControl>
+                          <DropdownMenuCheckboxItem
+                            checked={field.value.includes(category.id)}
+                            onCheckedChange={(checked) => {
+                              checked
+                                ? field.onChange([...field.value, category.id])
+                                : field.onChange(
+                                    field.value.filter(
+                                      (value) => value !== category.id
+                                    )
+                                  );
+                            }}
+                          >
+                            {category.title}
+                          </DropdownMenuCheckboxItem>
+                        </FormControl>
+                      </FormItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </FormItem>
               <FormMessage />
             </FormItem>
           )}
@@ -108,23 +245,67 @@ export default function SearchForm() {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Status</FormLabel>
-              <FormControl>
-                {/* Make it as a dropdown */}
-                <StatusSelect {...field} categories={categories} />
-              </FormControl>
+              <FormItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant={"outline"}>Filtrar por Status</Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel>Status</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuCheckboxItem
+                      checked={field.value.length === status.length}
+                      onCheckedChange={(checked) => {
+                        checked
+                          ? field.onChange(status.map((stat) => stat.name))
+                          : field.onChange([]);
+                      }}
+                    >
+                      Todos
+                    </DropdownMenuCheckboxItem>
+                    {status.map((stat) => (
+                      <FormItem key={stat.name}>
+                        <FormControl>
+                          <DropdownMenuCheckboxItem
+                            checked={field.value.includes(stat.name)}
+                            onCheckedChange={(checked) => {
+                              checked
+                                ? field.onChange([...field.value, stat.name])
+                                : field.onChange(
+                                    field.value.filter(
+                                      (value) => value !== stat.name
+                                    )
+                                  );
+                            }}
+                          >
+                            {stat.title}
+                          </DropdownMenuCheckboxItem>
+                        </FormControl>
+                      </FormItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </FormItem>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button variant={"secondary"} type="reset">
-          Limpar
-        </Button>
-        <Button
-          type="submit"
-          disabled={!form.formState.isValid || form.formState.isSubmitting}
-        >
-          {form.formState.isSubmitting ? "Carregando..." : "Enviar"}
-        </Button>
+        <div className="col-span-3 flex gap-6">
+          <Button
+            variant={"secondary"}
+            type="reset"
+            className="self-center w-full"
+          >
+            Limpar
+          </Button>
+          <Button
+            type="submit"
+            disabled={!form.formState.isValid || form.formState.isSubmitting}
+            className="self-center w-full"
+          >
+            {form.formState.isSubmitting ? "Carregando..." : "Enviar"}
+          </Button>
+        </div>
       </form>
     </Form>
   );

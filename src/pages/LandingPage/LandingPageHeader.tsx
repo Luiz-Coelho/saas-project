@@ -13,29 +13,7 @@ import { ModeToggle } from "../../components/mode-toggle";
 import List from "../../components/ui/list";
 import ListItem from "../../components/ui/list-item";
 import { Link } from "react-router-dom";
-
-//type Props = {};
-
-const components: { title: string; href: string; description: string }[] = [
-  {
-    title: "Extraordinário",
-    href: "#",
-    description:
-      "Este tipo de coleta é geralmente destinado a resíduos que não se enquadram nas categorias regulares de coleta. Pode incluir itens de grande volume ou resíduos gerados por eventos especiais que requerem atenção especial para o descarte.",
-  },
-  {
-    title: "Biológico",
-    href: "#",
-    description:
-      "Refere-se à coleta de resíduos que têm origem biológica, como restos de alimentos, folhas, caules, sementes, papéis usados, dejetos humanos, entre outros.",
-  },
-  {
-    title: "Químico",
-    href: "#",
-    description:
-      "Esses resíduos precisam de um tratamento especial para evitar a contaminação do meio ambiente e riscos à saúde pública. Normalmente, são incluídos na categoria de resíduos perigosos e podem ser identificados pela cor laranja em sistemas de coleta seletiva",
-  },
-];
+import { components } from "@/data";
 
 export default function LandingPageHeader() {
   return (
@@ -76,18 +54,20 @@ export default function LandingPageHeader() {
             </NavigationMenuContent>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <a href="#">
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Por que a 2MC?
-              </NavigationMenuLink>
-            </a>
+            <NavigationMenuLink
+              className={navigationMenuTriggerStyle()}
+              asChild
+            >
+              <Link to={"#"}>Por que a 2MC?</Link>
+            </NavigationMenuLink>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <a href="#">
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Contato
-              </NavigationMenuLink>
-            </a>
+            <NavigationMenuLink
+              className={navigationMenuTriggerStyle()}
+              asChild
+            >
+              <Link to={"#"}>Contato</Link>
+            </NavigationMenuLink>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
