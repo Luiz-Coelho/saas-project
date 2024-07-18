@@ -67,27 +67,42 @@ export default function SearchForm() {
 
   useEffect(() => {
     const subscription = form.watch((data) => {
-      mapEntries(data);
+      const params = new URLSearchParams();
+
+      Object.entries(data).forEach(([key, value]) => {
+        Array.isArray(value)
+          ? value.forEach((value) => value && params.append(key, value))
+          : params.append(key, value);
+      });
+
+      setSearchParams(params);
     });
 
     return () => subscription.unsubscribe();
   }, [form.watch, searchParams]);
 
-  function mapEntries(data: FormFields) {
+  const onSubmit: SubmitHandler<FormFields> = (data) => {
     const params = new URLSearchParams();
 
     Object.entries(data).forEach(([key, value]) => {
       Array.isArray(value)
-        ? value.forEach((value) => params.append(key, value))
+        ? value.forEach((value) => value && params.append(key, value))
         : params.append(key, value);
     });
 
     setSearchParams(params);
-  }
-
-  const onSubmit: SubmitHandler<FormFields> = (data) => {
-    mapEntries(data);
-    console.log(data);
+    fetch(`http://localhost:3000/customers/${params}`, {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        form.formState.isSubmitSuccessful && form.reset();
+      })
+      .catch((error) => console.log(error));
   };
 
   return (
@@ -295,6 +310,9 @@ export default function SearchForm() {
             variant={"secondary"}
             type="reset"
             className="self-center w-full"
+            onClick={() => {
+              form.reset();
+            }}
           >
             Limpar
           </Button>
