@@ -4,16 +4,18 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { categories, status, tracks } from "@/data";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
 import TextInput from "../../../../../components/TextFormInput";
 import DropdownInput from "../../../../../components/DropdownFormInput";
 
 const formSchema = z.object({
-  email: z.string().email().min(1, "Campo obrigatório"),
-  name: z.string().min(1, "Campo obrigatório"),
-  address: z.string().min(1, "Campo obrigatório"),
-  category: z.array(z.string()).min(1, "Campo obrigatório"),
+  email: z.string().optional(),
+  name: z.string().optional(),
+  address: z.string().optional(),
+  category: z.array(z.string()).optional(),
   track: z.array(z.string()).optional(),
-  status: z.string(),
+  status: z.array(z.string()).optional(),
 });
 
 type FormFields = z.infer<typeof formSchema>;
@@ -24,25 +26,70 @@ const defaultValues = {
   address: "",
   category: [],
   track: [],
-  status: "inactive",
+  status: [],
 };
 
-export default function NewCustomer() {
+export default function SearchForm() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const form = useForm<FormFields>({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues,
   });
 
+  useEffect(() => {
+    if (searchParams) {
+      const params = {
+        email: searchParams.get("email") || "",
+        name: searchParams.get("name") || "",
+        address: searchParams.get("address") || "",
+        category: searchParams.getAll("category") || [],
+        track: searchParams.getAll("track") || [],
+        status: searchParams.getAll("status") || [],
+      };
+
+      form.reset(params);
+    }
+  }, []);
+
+  useEffect(() => {
+    const subscription = form.watch((data) => {
+      const params = new URLSearchParams();
+
+      Object.entries(data).forEach(([key, value]) => {
+        Array.isArray(value)
+          ? value.forEach((value) => value && params.append(key, value))
+          : value && params.append(key, value);
+      });
+
+      setSearchParams(params);
+      console.log(`${searchParams}`);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [form.watch, searchParams]);
+
   const onSubmit: SubmitHandler<FormFields> = (data) => {
-    fetch("http://localhost:3000/customers", {
-      method: "POST",
+    const params = new URLSearchParams();
+
+    Object.entries(data).forEach(([key, value]) => {
+      Array.isArray(value)
+        ? value.forEach((value) => value && params.append(key, value))
+        : value && params.append(key, value);
+    });
+
+    setSearchParams(params);
+    fetch(`http://localhost:3000/customers?${searchParams}`, {
+      method: "GET",
       headers: {
         "Content-type": "application/json",
       },
-      body: JSON.stringify(data),
     })
       .then((res) => res.json())
-      .then((data) => console.log(data))
+      .then((data) => {
+        console.log(data);
+        form.formState.isSubmitSuccessful && form.reset();
+      })
       .catch((error) => console.log(error));
   };
 
@@ -52,39 +99,20 @@ export default function NewCustomer() {
         onSubmit={form.handleSubmit(onSubmit)}
         className="grid grid-cols-3 gap-y-6 gap-x-10 max-w-screen-xl mx-auto"
       >
-        <TextInput
-          control={form.control}
-          name="email"
-          label="Email"
-          description={
-            "É necessário fornecer o email para integrar com outras funcionalidades do sistema"
-          }
-        />
-        <TextInput
-          control={form.control}
-          name="name"
-          label="Nome"
-          description={"Insira o endereço de onde será realizada a coleta"}
-        />
-        <TextInput
-          control={form.control}
-          name="address"
-          label="Endereço"
-          description={"Insira o nome da empresa ou da pessoa"}
-        />
+        <TextInput control={form.control} name="email" label="Email" />
+        <TextInput control={form.control} name="name" label="Nome" />
+        <TextInput control={form.control} name="address" label="Endereço" />
         <DropdownInput
           control={form.control}
           name="track"
           label="Rota"
           data={tracks}
-          description="Esse campo pode ficar vazio e ter múltiplos valores"
         />
         <DropdownInput
           control={form.control}
           name="category"
           label="Finalidade"
           data={categories}
-          description="Esse campo pode ter múltiplos valores"
         />
         <DropdownInput
           control={form.control}

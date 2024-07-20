@@ -3,7 +3,7 @@ import { Category } from "./typing/Category";
 export const categories: Category[] = [
   {
     id: "1c",
-    title: "Extraordinário",
+    label: "Extraordinário",
     description: "Comum",
     frequency: [
       { text: "Diária", css: "daily" },
@@ -14,7 +14,7 @@ export const categories: Category[] = [
   },
   {
     id: "2c",
-    title: "Biológico",
+    label: "Biológico",
     description: "Infectante",
     frequency: [
       { text: "Semanal", css: "weekly" },
@@ -24,7 +24,7 @@ export const categories: Category[] = [
   },
   {
     id: "3c",
-    title: "Químico",
+    label: "Químico",
     description: "Perigosos",
     frequency: [
       { text: "Semanal", css: "weekly" },
@@ -34,7 +34,7 @@ export const categories: Category[] = [
   },
   {
     id: "4c",
-    title: "Reciclável",
+    label: "Reciclável",
     description: "Reciclável",
     frequency: [
       { text: "Semanal", css: "weekly" },
@@ -128,48 +128,50 @@ export const components: {
   },
 ];
 
-export const tracks: { id: string; name: string }[] = [
+export const tracks: { id: string; label: string }[] = [
   {
     id: "1f",
-    name: "A",
+    label: "A",
   },
   {
     id: "2f",
-    name: "B",
+    label: "B",
   },
   {
     id: "3f",
-    name: "C",
+    label: "C",
   },
   {
     id: "4f",
-    name: "D",
+    label: "D",
   },
   {
     id: "5f",
-    name: "Zona Sul",
+    label: "Zona Sul",
   },
   {
     id: "6f",
-    name: "Zona Norte",
+    label: "Zona Norte",
   },
   {
     id: "7f",
-    name: "Barra",
+    label: "Barra",
   },
   {
     id: "8f",
-    name: "Freguesia",
+    label: "Freguesia",
   },
 ];
 
-export const status: { name: string; title: string }[] = [
+export const status: { id: string; name: string; label: string }[] = [
   {
+    id: "1s",
     name: "active",
-    title: "Ativo",
+    label: "Ativo",
   },
   {
+    id: "2s",
     name: "inactive",
-    title: "Inativo",
+    label: "Inativo",
   },
 ];

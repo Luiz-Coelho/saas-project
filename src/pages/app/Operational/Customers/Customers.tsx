@@ -3,7 +3,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 
 import { GoPlus } from "react-icons/go";
-import SearchForm from "./SearchForm";
+import SearchForm from "./SearchForm/SearchForm";
 
 export default function Customers() {
   return (

@@ -1,8 +1,8 @@
 import { Frequency } from "./Frequency";
 
 export type Category = {
-  id: string,
-  title: string;
+  id: string;
+  label: string;
   description: string;
   frequency: Frequency[];
 };
