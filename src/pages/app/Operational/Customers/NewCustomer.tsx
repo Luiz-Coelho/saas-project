@@ -1,24 +1,21 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { Form } from "@/components/ui/form";
-import { categories, status, tracks } from "@/data";
-import TextInput from "../../../../../components/TextFormInput";
-import DropdownInput from "../../../../../components/DropdownFormInput";
+import { Button } from "@/components/ui/button";
+import TextInput from "../../../../components/TextInput";
+import DropdownInput from "../../../../components/DropdownInput";
 
-const formSchema = z.object({
-  email: z.string().email().min(1, "Campo obrigatório"),
-  name: z.string().min(1, "Campo obrigatório"),
-  address: z.string().min(1, "Campo obrigatório"),
-  category: z.array(z.string()).min(1, "Campo obrigatório"),
-  track: z.array(z.string()).optional(),
-  status: z.string(),
-});
+import { CreateCustomer } from "@/typing/Customer";
+import { fetchMountCustomerData } from "@/services/mountCustomerService";
+import { createCustomer } from "@/services/customerService";
+import SelectInput from "@/components/SelectInput";
+import { status } from "@/data";
 
-type FormFields = z.infer<typeof formSchema>;
+export type FormFields = CreateCustomer;
 
-const defaultValues = {
+const defaultValues: CreateCustomer = {
   email: "",
   name: "",
   address: "",
@@ -28,23 +25,37 @@ const defaultValues = {
 };
 
 export default function NewCustomer() {
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["categories", "tracks"],
+    queryFn: fetchMountCustomerData,
+  });
+
   const form = useForm<FormFields>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(CreateCustomer),
     defaultValues: defaultValues,
   });
 
-  const onSubmit: SubmitHandler<FormFields> = (data) => {
-    fetch("http://localhost:3000/customers", {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((res) => res.json())
-      .then((data) => console.log(data))
-      .catch((error) => console.log(error));
+  const mutation = useMutation({
+    mutationFn: createCustomer,
+    onSuccess: () => {
+      form.formState.isSubmitSuccessful && form.reset();
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
+    },
+  });
+
+  const onSubmit: SubmitHandler<CreateCustomer> = (data) => {
+    mutation.mutate(data);
   };
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (isError) return <div>Error: {error.message}</div>;
+
+  const categories = data?.categories || [];
+
+  const tracks = data?.tracks || [];
 
   return (
     <Form {...form}>
@@ -86,11 +97,14 @@ export default function NewCustomer() {
           data={categories}
           description="Esse campo pode ter múltiplos valores"
         />
-        <DropdownInput
+        <SelectInput
           control={form.control}
           name="status"
           label="Status"
           data={status}
+          keyField="_id"
+          valueField="value"
+          nameField="name"
         />
         <div className="col-span-3 flex gap-6">
           <Button
@@ -98,16 +112,12 @@ export default function NewCustomer() {
             type="reset"
             className="self-center w-full"
             onClick={() => {
-              form.reset(defaultValues);
+              form.reset();
             }}
           >
             Limpar
           </Button>
-          <Button
-            type="submit"
-            disabled={!form.formState.isValid || form.formState.isSubmitting}
-            className="self-center w-full"
-          >
+          <Button type="submit" className="self-center w-full">
             {form.formState.isSubmitting ? "Carregando..." : "Enviar"}
           </Button>
         </div>

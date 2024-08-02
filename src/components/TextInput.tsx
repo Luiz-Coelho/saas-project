@@ -14,6 +14,7 @@ type TextInputProps<T extends FieldValues> = {
   name: Path<T>;
   label: string;
   description?: string;
+  className?: string;
 };
 
 export default function TextInput<T extends FieldValues>({
@@ -21,13 +22,14 @@ export default function TextInput<T extends FieldValues>({
   name,
   label,
   description,
+  className,
 }: TextInputProps<T>) {
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className={className}>
           <FormLabel>{label}</FormLabel>
           <FormDescription>{description}</FormDescription>
           <FormControl>

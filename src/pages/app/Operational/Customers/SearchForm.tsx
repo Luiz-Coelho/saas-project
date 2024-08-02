@@ -1,24 +1,18 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Form } from "@/components/ui/form";
-import { categories, status, tracks } from "@/data";
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
-import TextInput from "../../../../../components/TextFormInput";
-import DropdownInput from "../../../../../components/DropdownFormInput";
+import { SearchCustomer } from "@/typing/Customer";
+import { status } from "@/data";
 
-const formSchema = z.object({
-  email: z.string().optional(),
-  name: z.string().optional(),
-  address: z.string().optional(),
-  category: z.array(z.string()).optional(),
-  track: z.array(z.string()).optional(),
-  status: z.array(z.string()).optional(),
-});
+import { Form } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import TextInput from "../../../../components/TextInput";
+import DropdownInput from "../../../../components/DropdownInput";
+import { Category } from "@/typing/Category";
+import { Track } from "@/typing/Track";
 
-type FormFields = z.infer<typeof formSchema>;
+type SearchFormFields = SearchCustomer;
 
 const defaultValues = {
   email: "",
@@ -29,11 +23,21 @@ const defaultValues = {
   status: [],
 };
 
-export default function SearchForm() {
+type SearchFormProps = {
+  onSubmit: SubmitHandler<SearchFormFields>;
+  categories: Category[];
+  tracks: Track[];
+};
+
+export default function SearchForm({
+  onSubmit,
+  categories,
+  tracks,
+}: SearchFormProps) {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const form = useForm<FormFields>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<SearchFormFields>({
+    resolver: zodResolver(SearchCustomer),
     defaultValues: defaultValues,
   });
 
@@ -63,35 +67,10 @@ export default function SearchForm() {
       });
 
       setSearchParams(params);
-      console.log(`${searchParams}`);
     });
 
     return () => subscription.unsubscribe();
   }, [form.watch, searchParams]);
-
-  const onSubmit: SubmitHandler<FormFields> = (data) => {
-    const params = new URLSearchParams();
-
-    Object.entries(data).forEach(([key, value]) => {
-      Array.isArray(value)
-        ? value.forEach((value) => value && params.append(key, value))
-        : value && params.append(key, value);
-    });
-
-    setSearchParams(params);
-    fetch(`http://localhost:3000/customers?${searchParams}`, {
-      method: "GET",
-      headers: {
-        "Content-type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        form.formState.isSubmitSuccessful && form.reset();
-      })
-      .catch((error) => console.log(error));
-  };
 
   return (
     <Form {...form}>

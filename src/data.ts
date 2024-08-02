@@ -1,46 +1,22 @@
-import { Category } from "./typing/Category";
+import { Frequency } from "./typing/Frequency";
+import { Status } from "./typing/Status";
 
-export const categories: Category[] = [
+export const frequencies: Frequency[] = [
   {
-    id: "1c",
-    label: "Extraordinário",
-    description: "Comum",
-    frequency: [
-      { text: "Diária", css: "daily" },
-      { text: "Semanal", css: "weekly" },
-      { text: "Mensal", css: "monthly" },
-      { text: "Eventual", css: "eventually" },
-    ],
+    text: "Diária",
+    css: "daily",
   },
   {
-    id: "2c",
-    label: "Biológico",
-    description: "Infectante",
-    frequency: [
-      { text: "Semanal", css: "weekly" },
-      { text: "Mensal", css: "monthly" },
-      { text: "Eventual", css: "eventually" },
-    ],
+    text: "Semanal",
+    css: "weekly",
   },
   {
-    id: "3c",
-    label: "Químico",
-    description: "Perigosos",
-    frequency: [
-      { text: "Semanal", css: "weekly" },
-      { text: "Mensal", css: "monthly" },
-      { text: "Eventual", css: "eventually" },
-    ],
+    text: "Mensal",
+    css: "monthly",
   },
   {
-    id: "4c",
-    label: "Reciclável",
-    description: "Reciclável",
-    frequency: [
-      { text: "Semanal", css: "weekly" },
-      { text: "Mensal", css: "monthly" },
-      { text: "Eventual", css: "eventually" },
-    ],
+    text: "Eventual",
+    css: "eventually",
   },
 ];
 
@@ -60,6 +36,14 @@ export const routeNames: { path: string; label: string }[] = [
   {
     path: "newuser",
     label: "Novo Usuário",
+  },
+  {
+    path: "categories",
+    label: "Finalidades",
+  },
+  {
+    path: "newcategory",
+    label: "Nova Finalidade",
   },
   {
     path: "departments",
@@ -98,6 +82,10 @@ export const routeNames: { path: string; label: string }[] = [
     label: "Rotas",
   },
   {
+    path: "newtrack",
+    label: "Nova Rota",
+  },
+  {
     path: "automobiles",
     label: "Automóveis",
   },
@@ -128,50 +116,15 @@ export const components: {
   },
 ];
 
-export const tracks: { id: string; label: string }[] = [
+export const status: Status[] = [
   {
-    id: "1f",
-    label: "A",
+    _id: "1s",
+    value: "active",
+    name: "Ativo",
   },
   {
-    id: "2f",
-    label: "B",
-  },
-  {
-    id: "3f",
-    label: "C",
-  },
-  {
-    id: "4f",
-    label: "D",
-  },
-  {
-    id: "5f",
-    label: "Zona Sul",
-  },
-  {
-    id: "6f",
-    label: "Zona Norte",
-  },
-  {
-    id: "7f",
-    label: "Barra",
-  },
-  {
-    id: "8f",
-    label: "Freguesia",
-  },
-];
-
-export const status: { id: string; name: string; label: string }[] = [
-  {
-    id: "1s",
-    name: "active",
-    label: "Ativo",
-  },
-  {
-    id: "2s",
-    name: "inactive",
-    label: "Inativo",
+    _id: "2s",
+    value: "inactive",
+    name: "Inativo",
   },
 ];

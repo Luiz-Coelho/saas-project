@@ -25,7 +25,7 @@ export default function CrumbHeader({ className }: CrumbHeaderProps) {
       <BreadcrumbList>
         {paths.map((path, index) => {
           const route = routeNames.find((route) => route.path === path);
-          const label = route?.label;
+          const label = route?.label || path;
           return (
             <React.Fragment key={path}>
               <BreadcrumbItem>

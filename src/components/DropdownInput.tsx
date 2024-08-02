@@ -15,26 +15,26 @@ import {
   FormMessage,
   FormDescription,
 } from "@/components/ui/form";
+import { Category } from "@/typing/Category";
+import { Status } from "@/typing/Status";
+import { Track } from "@/typing/Track";
 import { Control, FieldValues, Path } from "react-hook-form";
 
-type DropdownInputProps<T extends FieldValues> = {
+type DropdownFormInputProps<T extends FieldValues> = {
   control: Control<T>;
   name: Path<T>;
   label: string;
-  data: {
-    id: string;
-    label: string;
-  }[];
+  data: Track[] | Category[] | Status[];
   description?: string;
 };
 
-export default function DropdownInput<T extends FieldValues>({
+export default function DropdownFormInput<T extends FieldValues>({
   control,
   name,
   label,
   data,
   description,
-}: DropdownInputProps<T>) {
+}: DropdownFormInputProps<T>) {
   return (
     <FormField
       control={control}
@@ -55,28 +55,28 @@ export default function DropdownInput<T extends FieldValues>({
                   checked={field.value.length === data.length}
                   onCheckedChange={(checked) => {
                     checked
-                      ? field.onChange(data.map((i) => i.id))
+                      ? field.onChange(data.map((d) => d._id))
                       : field.onChange([]);
                   }}
                 >
                   Todas
                 </DropdownMenuCheckboxItem>
-                {data.map((i) => (
-                  <FormItem key={i.id}>
+                {data.map((d) => (
+                  <FormItem key={d._id}>
                     <FormControl>
                       <DropdownMenuCheckboxItem
-                        checked={field.value?.includes(i.id)}
+                        checked={field.value?.includes(d._id)}
                         onCheckedChange={(checked) => {
                           field.value && checked
-                            ? field.onChange([...field.value, i.id])
+                            ? field.onChange([...field.value, d._id])
                             : field.onChange(
                                 field.value.filter(
-                                  (value: string) => value !== i.id
+                                  (value: string) => value !== d._id
                                 )
                               );
                         }}
                       >
-                        {i.label}
+                        {d.name}
                       </DropdownMenuCheckboxItem>
                     </FormControl>
                   </FormItem>

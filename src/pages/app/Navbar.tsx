@@ -33,6 +33,7 @@ export default function Navbar() {
 
           <h2 className="text-muted-foreground">Operacional</h2>
           <MainNav to={"/app/operational/customers"} text={"Clientes"} />
+          <MainNav to={"/app/operational/categories"} text={"Finalidades"} />
           <MainNav to={"/app/operational/automobiles"} text={"Automóveis"} />
           <MainNav to={"/app/operational/tracks"} text={"Rotas"} />
           <MainNav to={"/app/operational/orders"} text={"Ordens de Serviço"} />

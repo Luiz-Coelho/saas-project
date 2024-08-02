@@ -8,26 +8,27 @@ import {
 } from "@/components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
-import { Category } from "@/typing/Category";
+import { frequencies } from "@/data";
 
 type PricingCardProps = {
-  item: Category;
+  label: string;
+  description: string;
 };
 
-export default function PricingCard({
-  item: { title, description, frequency },
-}: PricingCardProps) {
+export default function PricingCard({ label, description }: PricingCardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <CardTitle>{label}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
         <h2>Frequências de coletas disponíveis:</h2>
         <div className="flex flex-wrap gap-2 mt-4">
-          {frequency.map((freq) => (
-            <Badge key={freq.text} variant={freq.css}>{freq.text}</Badge>
+          {frequencies.map((frequency) => (
+            <Badge key={frequency.text} variant={frequency.css}>
+              {frequency.text}
+            </Badge>
           ))}
         </div>
       </CardContent>

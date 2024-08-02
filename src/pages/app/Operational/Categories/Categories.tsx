@@ -1,16 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { DataTable } from "@/components/DataTable";
-
-import { MyDialog } from "@/components/MyDialog";
 import { columns } from "./Table/Columns";
-import NewAutomobile from "./NewAutomobile";
-import { getAutomobiles } from "@/services/automobilesService";
 
-export default function Automobiles() {
+import { getCategories } from "@/services/categoriesService";
+import { MyDialog } from "@/components/MyDialog";
+import NewCategory from "./NewCategory";
+
+export default function Categories() {
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["automobiles"],
-    queryFn: getAutomobiles,
+    queryKey: ["categories"],
+    queryFn: getCategories,
   });
 
   if (isLoading) return <div>Loading...</div>;
@@ -21,11 +21,11 @@ export default function Automobiles() {
     return (
       <div className="space-y-4">
         <div className="grid grid-flow-col">
-          <h2 className="self-center">Buscar Carro(s)</h2>
+          <h2 className="self-center">Buscar Finalidade(s)</h2>
           <MyDialog
-            label="Criar Carro"
-            description="Crie uma novo carro aqui. Clique em criar quando estiver pronto."
-            children={<NewAutomobile />}
+            label="Criar Finalidade"
+            description="Crie uma nova finalidade aqui. Clique em criar quando estiver pronto."
+            children={<NewCategory />}
           />
         </div>
         <DataTable columns={columns} data={data} />
