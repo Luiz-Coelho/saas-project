@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button";
 import TextInput from "../../../../components/TextInput";
 import DropdownInput from "../../../../components/DropdownInput";
 
-import { CreateCustomer } from "@/typing/Customer";
+import { CreateCustomer } from "@/types/Customer";
 import { fetchMountCustomerData } from "@/services/mountCustomerService";
 import { createCustomer } from "@/services/customerService";
 import SelectInput from "@/components/SelectInput";
-import { status } from "@/data";
+import { useToast } from "@/components/ui/use-toast";
 
 export type FormFields = CreateCustomer;
 
@@ -19,16 +19,17 @@ const defaultValues: CreateCustomer = {
   email: "",
   name: "",
   address: "",
-  category: [],
+  category: [""],
   track: [],
-  status: "inactive",
+  status: "inativo",
 };
 
 export default function NewCustomer() {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["categories", "tracks"],
+    queryKey: ["categories", "tracks", "statuses"],
     queryFn: fetchMountCustomerData,
   });
 
@@ -42,10 +43,14 @@ export default function NewCustomer() {
     onSuccess: () => {
       form.formState.isSubmitSuccessful && form.reset();
       queryClient.invalidateQueries({ queryKey: ["customers"] });
+      toast({
+        description: "Novo cliente cadastrado com sucesso!",
+      });
     },
   });
 
   const onSubmit: SubmitHandler<CreateCustomer> = (data) => {
+    console.log(data);
     mutation.mutate(data);
   };
 
@@ -56,6 +61,8 @@ export default function NewCustomer() {
   const categories = data?.categories || [];
 
   const tracks = data?.tracks || [];
+
+  const statuses = data?.statuses || [];
 
   return (
     <Form {...form}>
@@ -101,9 +108,9 @@ export default function NewCustomer() {
           control={form.control}
           name="status"
           label="Status"
-          data={status}
+          data={statuses}
           keyField="_id"
-          valueField="value"
+          valueField="_id"
           nameField="name"
         />
         <div className="col-span-3 flex gap-6">

@@ -6,13 +6,20 @@ import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 
 import { createCategory } from "@/services/categoriesService";
-import { CreateCategory } from "@/typing/Category";
+import { CreateCategory } from "@/types/Category";
 import TextInput from "@/components/TextInput";
+import { isAxiosError } from "axios";
+import { useToast } from "@/components/ui/use-toast";
 
 export type FormFields = CreateCategory;
 
-export default function NewCategory() {
+type NewCategoryProps = {
+  closeDialog: () => void;
+};
+
+export default function NewCategory({ closeDialog }: NewCategoryProps) {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const form = useForm<FormFields>({
     resolver: zodResolver(CreateCategory),
@@ -27,6 +34,18 @@ export default function NewCategory() {
     onSuccess: () => {
       form.formState.isSubmitSuccessful && form.reset();
       queryClient.invalidateQueries({ queryKey: ["categories"] });
+      closeDialog();
+      toast({
+        description: "Nova Finalidade criada com sucesso!",
+      });
+    },
+    onError: (error) => {
+      if (isAxiosError(error)) {
+        console.log(error);
+        form.setError("name", error.response?.data, {
+          shouldFocus: true,
+        });
+      }
     },
   });
 

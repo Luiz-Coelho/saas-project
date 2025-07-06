@@ -1,12 +1,13 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Category } from "@/typing/Category";
 
 import SortingHeader from "@/components/SortingHeader";
 import SelectHeader from "@/components/SelectHeader";
 import SelectRow from "@/components/SelectRow";
 import ActionsDiv from "@/components/ActionsDiv";
+import UpdateCategory from "../UpdateCategory";
+import { CategoryPopulated } from "@/types/Category";
 
-type Data = Category;
+type Data = CategoryPopulated;
 
 export const columns: ColumnDef<Data>[] = [
   {
@@ -19,15 +20,25 @@ export const columns: ColumnDef<Data>[] = [
     header: ({ column }) => <SortingHeader column={column} name="Nome" />,
   },
   {
-    accessorKey: "customers.name",
+    accessorFn: (row) => row.track.map((t) => t.name).join(", "),
+    id: "tracks",
     header: ({ column }) => <SortingHeader column={column} name="Clientes" />,
   },
   {
-    accessorKey: "track.name",
+    accessorFn: (row) => row.customer.map((c) => c.name).join(", "),
+    id: "customers",
     header: ({ column }) => <SortingHeader column={column} name="Rotas" />,
   },
   {
     id: "actions",
-    cell: ({ row }) => <ActionsDiv id={row.original._id} />,
+    cell: ({ row }) => (
+      <ActionsDiv
+        id={row.original._id}
+        title="Editar Finalidade"
+        children={
+          <UpdateCategory id={row.original._id} closeDialog={() => {}} />
+        }
+      />
+    ),
   },
 ];

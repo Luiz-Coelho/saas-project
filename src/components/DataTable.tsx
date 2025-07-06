@@ -23,11 +23,16 @@ import TableFooter from "@/components/TableFooter";
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  meta?: {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+  };
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  meta,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [rowSelection, setRowSelection] = useState({});
@@ -43,6 +48,7 @@ export function DataTable<TData, TValue>({
       sorting,
       rowSelection,
     },
+    meta,
   });
 
   return (

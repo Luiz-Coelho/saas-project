@@ -2,15 +2,15 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams } from "react-router-dom";
 import { useEffect } from "react";
-import { SearchCustomer } from "@/typing/Customer";
-import { status } from "@/data";
+import { SearchCustomer } from "@/types/Customer";
 
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import TextInput from "../../../../components/TextInput";
 import DropdownInput from "../../../../components/DropdownInput";
-import { Category } from "@/typing/Category";
-import { Track } from "@/typing/Track";
+import { CategoryPopulated } from "@/types/Category";
+import { TrackPopulated } from "@/types/Track";
+import { Status } from "@/types/Status";
 
 type SearchFormFields = SearchCustomer;
 
@@ -25,14 +25,16 @@ const defaultValues = {
 
 type SearchFormProps = {
   onSubmit: SubmitHandler<SearchFormFields>;
-  categories: Category[];
-  tracks: Track[];
+  categories: CategoryPopulated[];
+  tracks: TrackPopulated[];
+  statuses: Status[];
 };
 
 export default function SearchForm({
   onSubmit,
   categories,
   tracks,
+  statuses,
 }: SearchFormProps) {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -97,7 +99,7 @@ export default function SearchForm({
           control={form.control}
           name="status"
           label="Status"
-          data={status}
+          data={statuses}
         />
         <div className="col-span-3 flex gap-6">
           <Button

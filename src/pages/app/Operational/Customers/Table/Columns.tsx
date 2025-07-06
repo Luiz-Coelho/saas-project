@@ -1,22 +1,15 @@
 import { ColumnDef } from "@tanstack/react-table";
 
-import { Customer } from "@/typing/Customer";
+import { CustomerPopulated } from "@/types/Customer";
 
 import SortingHeader from "@/components/SortingHeader";
 import SelectHeader from "@/components/SelectHeader";
 import SelectRow from "@/components/SelectRow";
-import ActionsDiv from "@/components/ActionsDiv";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
+import { Link } from "react-router-dom";
 
-type Data = Omit<Customer, "category" | "track"> & {
-  category: {
-    _id: string;
-    name: string;
-  }[];
-  track: {
-    _id: string;
-    name: string;
-  }[];
-};
+type Data = CustomerPopulated;
 
 export const columns: ColumnDef<Data>[] = [
   {
@@ -42,16 +35,22 @@ export const columns: ColumnDef<Data>[] = [
     header: ({ column }) => <SortingHeader column={column} name="Finalidade" />,
   },
   {
-    accessorKey: "status",
+    accessorKey: "status.name",
     header: ({ column }) => <SortingHeader column={column} name="Status" />,
   },
   {
-    accessorFn: (row) => row.track?.map((t) => t.name).join(", "),
+    accessorFn: (row) => row.track.map((t) => t.name).join(", "),
     id: "tracks",
     header: ({ column }) => <SortingHeader column={column} name="Rotas" />,
   },
   {
     id: "actions",
-    cell: ({ row }) => <ActionsDiv id={row.original._id} />,
+    cell: ({ row }) => (
+      <Button variant={"ghost"} asChild>
+        <Link to={row.original._id}>
+          <Pencil size={18} />
+        </Link>
+      </Button>
+    ),
   },
 ];

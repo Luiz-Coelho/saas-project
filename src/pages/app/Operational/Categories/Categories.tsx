@@ -6,8 +6,11 @@ import { columns } from "./Table/Columns";
 import { getCategories } from "@/services/categoriesService";
 import { MyDialog } from "@/components/MyDialog";
 import NewCategory from "./NewCategory";
+import { useState } from "react";
 
 export default function Categories() {
+  const [open, setOpen] = useState(false);
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["categories"],
     queryFn: getCategories,
@@ -20,15 +23,20 @@ export default function Categories() {
   if (data) {
     return (
       <div className="space-y-4">
-        <div className="grid grid-flow-col">
+        <div className="grid grid-flow-col py-4">
           <h2 className="self-center">Buscar Finalidade(s)</h2>
           <MyDialog
+            open={open}
+            onOpenChange={setOpen}
             label="Criar Finalidade"
-            description="Crie uma nova finalidade aqui. Clique em criar quando estiver pronto."
-            children={<NewCategory />}
+            children={<NewCategory closeDialog={() => setOpen(false)} />}
           />
         </div>
-        <DataTable columns={columns} data={data} />
+        <DataTable
+          columns={columns}
+          data={data}
+          meta={{ open: open, onOpenChange: setOpen }}
+        />
       </div>
     );
   }

@@ -1,57 +1,65 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 
+import { getCategoryById, updateCategory } from "@/services/categoriesService";
+import { Category } from "@/types/Category";
 import TextInput from "@/components/TextInput";
-import { CreateAutomobile } from "@/types/Automobile";
-import { createAutomobile } from "@/services/automobilesService";
-import { isAxiosError } from "axios";
+import { useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
-export type FormFields = CreateAutomobile;
+export type FormFields = Category;
 
-type NewAutomobileProps = {
+type UpdateCategoryProps = {
+  id: string;
   closeDialog: () => void;
 };
 
-export default function NewAutomobile({ closeDialog }: NewAutomobileProps) {
+export default function UpdateCategory({
+  id,
+  closeDialog,
+}: UpdateCategoryProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const form = useForm<FormFields>({
-    resolver: zodResolver(CreateAutomobile),
+    resolver: zodResolver(Category),
     defaultValues: {
       name: "",
-      licensePlate: "",
+      description: "",
     },
   });
 
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["category", id],
+    queryFn: () => getCategoryById(id),
+  });
+
+  useEffect(() => {
+    form.reset(data);
+  }, [data]);
+
   const mutation = useMutation({
-    mutationFn: createAutomobile,
+    mutationFn: updateCategory,
     onSuccess: () => {
-      form.formState.isSubmitSuccessful && form.reset();
-      queryClient.invalidateQueries({ queryKey: ["automobiles"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       closeDialog();
       toast({
-        description: "Novo automóvel criado com sucesso!",
+        description: "Finalidade atualizada com sucesso!",
       });
-    },
-    onError: (error) => {
-      if (isAxiosError(error)) {
-        console.log(error);
-        form.setError("licensePlate", error.response?.data, {
-          shouldFocus: true,
-        });
-      }
     },
   });
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     mutation.mutate(data);
   };
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (isError) return <div>Error: {error.message}</div>;
 
   return (
     <Form {...form}>
@@ -65,8 +73,8 @@ export default function NewAutomobile({ closeDialog }: NewAutomobileProps) {
           />
           <TextInput
             control={form.control}
-            name="licensePlate"
-            label="Placa"
+            name="description"
+            label="Descrição"
             className="col-span-3"
           />
           <div className="col-span-3 flex gap-6 py-4">

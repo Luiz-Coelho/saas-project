@@ -6,8 +6,11 @@ import { DataTable } from "@/components/DataTable";
 import { getTracks } from "@/services/trackService";
 import NewTrack from "./NewTrack";
 import { MyDialog } from "@/components/MyDialog";
+import { useState } from "react";
 
 export default function Customers() {
+  const [open, setOpen] = useState(false);
+
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["tracks"],
     queryFn: getTracks,
@@ -20,15 +23,20 @@ export default function Customers() {
   if (data) {
     return (
       <div className="space-y-4">
-        <div className="grid grid-flow-col">
+        <div className="grid grid-flow-col py-4 ">
           <h2 className="self-center">Buscar Rota(s)</h2>
           <MyDialog
+            open={open}
+            onOpenChange={setOpen}
             label="Criar Rota"
-            description="Crie uma nova rota aqui. Clique em criar quando estiver pronto."
-            children={<NewTrack />}
+            children={<NewTrack closeDialog={() => setOpen(false)} />}
           />
         </div>
-        <DataTable columns={columns} data={data} />
+        <DataTable
+          columns={columns}
+          data={data}
+          meta={{ open, onOpenChange: setOpen }}
+        />
       </div>
     );
   }

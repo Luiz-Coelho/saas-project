@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const AutomobileBase = z.object({
-  name: z.string(),
-  licensePlate: z.string(),
+  name: z.string().min(1, "Campo obrigatório").toLowerCase().trim(),
+  licensePlate: z.string().min(1, "Campo obrigatório").toLowerCase().trim(),
 });
 
 export type AutomobileBase = z.infer<typeof AutomobileBase>;

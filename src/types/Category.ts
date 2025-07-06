@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const CategoryBase = z.object({
-  name: z.string(),
-  description: z.string().optional(),
+  name: z.string().min(1, "Campo obrigatório").toLowerCase().trim(),
+  description: z.string().toLowerCase().trim().optional(),
   track: z.array(z.string()).optional(),
   customer: z.array(z.string()).optional(),
 });
@@ -14,22 +14,17 @@ export type CreateCategory = z.infer<typeof CreateCategory>;
 
 export const Category = CategoryBase.extend({
   _id: z.string(),
-  track: z
-    .array(
-      z.object({
-        _id: z.string(),
-        name: z.string(),
-      })
-    )
-    .optional(),
-  customer: z
-    .array(
-      z.object({
-        _id: z.string(),
-        name: z.string(),
-      })
-    )
-    .optional(),
 });
 
 export type Category = z.infer<typeof Category>;
+
+export type CategoryPopulated = Omit<Category, "track" | "customer"> & {
+  track: {
+    _id: string;
+    name: string;
+  }[];
+  customer: {
+    _id: string;
+    name: string;
+  }[];
+};

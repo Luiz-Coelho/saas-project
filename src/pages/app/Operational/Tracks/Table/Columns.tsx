@@ -1,12 +1,13 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Track } from "@/typing/Track";
+import { TrackPopulated } from "@/types/Track";
 
 import SortingHeader from "@/components/SortingHeader";
 import SelectHeader from "@/components/SelectHeader";
 import SelectRow from "@/components/SelectRow";
 
 import ActionsDiv from "@/components/ActionsDiv";
-type Data = Track;
+import UpdateTrack from "../UpdateTrack";
+type Data = TrackPopulated;
 
 export const columns: ColumnDef<Data>[] = [
   {
@@ -23,11 +24,18 @@ export const columns: ColumnDef<Data>[] = [
     header: ({ column }) => <SortingHeader column={column} name="Finalidade" />,
   },
   {
-    accessorKey: "customers.name",
+    accessorFn: (row) => row.customer.map((c) => c.name).join(", "),
+    id: "customers",
     header: ({ column }) => <SortingHeader column={column} name="Clientes" />,
   },
   {
     id: "actions",
-    cell: ({ row }) => <ActionsDiv id={row.original._id} />,
+    cell: ({ row }) => (
+      <ActionsDiv
+        id={row.original._id}
+        title="Editar Rota"
+        children={<UpdateTrack id={row.original._id} closeDialog={() => {}} />}
+      />
+    ),
   },
 ];

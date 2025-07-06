@@ -1,5 +1,4 @@
-import { Frequency } from "./typing/Frequency";
-import { Status } from "./typing/Status";
+import { Frequency } from "./types/Frequency";
 
 export const frequencies: Frequency[] = [
   {
@@ -113,18 +112,5 @@ export const components: {
     href: "#",
     description:
       "Esses resíduos precisam de um tratamento especial para evitar a contaminação do meio ambiente e riscos à saúde pública. Normalmente, são incluídos na categoria de resíduos perigosos e podem ser identificados pela cor laranja em sistemas de coleta seletiva",
-  },
-];
-
-export const status: Status[] = [
-  {
-    _id: "1s",
-    value: "active",
-    name: "Ativo",
-  },
-  {
-    _id: "2s",
-    value: "inactive",
-    name: "Inativo",
   },
 ];

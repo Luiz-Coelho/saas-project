@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/button";
 import TextInput from "../../../../components/TextInput";
 import DropdownInput from "../../../../components/DropdownInput";
 
-import { status } from "@/data";
-import { Customer } from "@/typing/Customer";
+import { Customer } from "@/types/Customer";
 import { fetchMountCustomerData } from "@/services/mountCustomerService";
 import { getCustomerById, updateCustomer } from "@/services/customerService";
 import SelectInput from "@/components/SelectInput";
@@ -22,7 +21,7 @@ const defaultValues: Customer = {
   email: "",
   name: "",
   address: "",
-  category: [],
+  category: [""],
   track: [],
   status: "inactive",
 };
@@ -32,7 +31,7 @@ export default function UpdateCustomer() {
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["categories", "tracks"],
+    queryKey: ["categories", "tracks", "statuses"],
     queryFn: fetchMountCustomerData,
   });
 
@@ -75,6 +74,8 @@ export default function UpdateCustomer() {
   const categories = data?.categories || [];
 
   const tracks = data?.tracks || [];
+
+  const statuses = data?.statuses || [];
 
   return (
     <Form {...form}>
@@ -120,9 +121,9 @@ export default function UpdateCustomer() {
           control={form.control}
           name="status"
           label="Status"
-          data={status}
+          data={statuses}
           keyField="_id"
-          valueField="value"
+          valueField="_id"
           nameField="name"
         />
         <div className="col-span-3 flex gap-6">

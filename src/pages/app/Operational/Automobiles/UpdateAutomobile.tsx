@@ -1,42 +1,58 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 
+import { Automobile } from "@/types/Automobile";
 import TextInput from "@/components/TextInput";
-import { CreateAutomobile } from "@/types/Automobile";
-import { createAutomobile } from "@/services/automobilesService";
-import { isAxiosError } from "axios";
+import { useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  getAutomobileById,
+  updateAutomobile,
+} from "@/services/automobilesService";
+import { isAxiosError } from "axios";
 
-export type FormFields = CreateAutomobile;
+export type FormFields = Automobile;
 
-type NewAutomobileProps = {
+type UpdateAutomobileProps = {
+  id: string;
   closeDialog: () => void;
 };
 
-export default function NewAutomobile({ closeDialog }: NewAutomobileProps) {
+export default function UpdateAutomobile({
+  id,
+  closeDialog,
+}: UpdateAutomobileProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const form = useForm<FormFields>({
-    resolver: zodResolver(CreateAutomobile),
+    resolver: zodResolver(Automobile),
     defaultValues: {
       name: "",
       licensePlate: "",
     },
   });
 
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["automobile", id],
+    queryFn: () => getAutomobileById(id),
+  });
+
+  useEffect(() => {
+    form.reset(data);
+  }, [data]);
+
   const mutation = useMutation({
-    mutationFn: createAutomobile,
+    mutationFn: updateAutomobile,
     onSuccess: () => {
-      form.formState.isSubmitSuccessful && form.reset();
       queryClient.invalidateQueries({ queryKey: ["automobiles"] });
       closeDialog();
       toast({
-        description: "Novo automóvel criado com sucesso!",
+        description: "Automóvel atualizado com sucesso!",
       });
     },
     onError: (error) => {
@@ -52,6 +68,10 @@ export default function NewAutomobile({ closeDialog }: NewAutomobileProps) {
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     mutation.mutate(data);
   };
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (isError) return <div>Error: {error.message}</div>;
 
   return (
     <Form {...form}>

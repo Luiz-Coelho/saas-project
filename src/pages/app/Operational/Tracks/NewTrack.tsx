@@ -8,13 +8,19 @@ import { Button } from "@/components/ui/button";
 import TextInput from "@/components/TextInput";
 import SelectInput from "@/components/SelectInput";
 import { createTrack } from "@/services/trackService";
-import { CreateTrack } from "@/typing/Track";
+import { CreateTrack } from "@/types/Track";
 import { getCategories } from "@/services/categoriesService";
+import { useToast } from "@/components/ui/use-toast";
 
 export type FormFields = CreateTrack;
 
-export default function NewTrack() {
+type NewTrackProps = {
+  closeDialog: () => void;
+};
+
+export default function NewTrack({ closeDialog }: NewTrackProps) {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["categories"],
@@ -34,10 +40,15 @@ export default function NewTrack() {
     onSuccess: () => {
       form.formState.isSubmitSuccessful && form.reset();
       queryClient.invalidateQueries({ queryKey: ["tracks"] });
+      closeDialog();
+      toast({
+        description: "Nova Rota criada com sucesso!",
+      });
     },
   });
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
+    console.log(data);
     mutation.mutate(data);
   };
 

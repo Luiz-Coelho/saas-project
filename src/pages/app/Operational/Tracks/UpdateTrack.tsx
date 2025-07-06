@@ -1,57 +1,77 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 
 import TextInput from "@/components/TextInput";
-import { CreateAutomobile } from "@/types/Automobile";
-import { createAutomobile } from "@/services/automobilesService";
-import { isAxiosError } from "axios";
+import { useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { Track } from "@/types/Track";
+import { getTrackById, updateTrack } from "@/services/trackService";
+import SelectInput from "@/components/SelectInput";
+import { getCategories } from "@/services/categoriesService";
 
-export type FormFields = CreateAutomobile;
+export type FormFields = Track;
 
-type NewAutomobileProps = {
+type UpdateTrackProps = {
+  id: string;
   closeDialog: () => void;
 };
 
-export default function NewAutomobile({ closeDialog }: NewAutomobileProps) {
+export default function UpdateTrack({ id, closeDialog }: UpdateTrackProps) {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const form = useForm<FormFields>({
-    resolver: zodResolver(CreateAutomobile),
+    resolver: zodResolver(Track),
     defaultValues: {
       name: "",
-      licensePlate: "",
+      category: "",
     },
   });
 
+  const {
+    data: mountData,
+    isLoading: isLoadingMount,
+    isError: isMountError,
+    error: mountError,
+  } = useQuery({
+    queryKey: ["categories"],
+    queryFn: getCategories,
+  });
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["track", id],
+    queryFn: () => getTrackById(id),
+  });
+
+  useEffect(() => {
+    form.reset(data);
+  }, [data]);
+
   const mutation = useMutation({
-    mutationFn: createAutomobile,
+    mutationFn: updateTrack,
     onSuccess: () => {
-      form.formState.isSubmitSuccessful && form.reset();
-      queryClient.invalidateQueries({ queryKey: ["automobiles"] });
+      queryClient.invalidateQueries({ queryKey: ["tracks"] });
       closeDialog();
       toast({
-        description: "Novo automóvel criado com sucesso!",
+        description: "Rota atualizada com sucesso!",
       });
-    },
-    onError: (error) => {
-      if (isAxiosError(error)) {
-        console.log(error);
-        form.setError("licensePlate", error.response?.data, {
-          shouldFocus: true,
-        });
-      }
     },
   });
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     mutation.mutate(data);
   };
+
+  if (isLoading || isLoadingMount) return <div>Loading...</div>;
+
+  if (isError) return <div>Error: {error.message}</div>;
+  if (isMountError) return <div>Error: {mountError.message}</div>;
+
+  const categories = mountData || [];
 
   return (
     <Form {...form}>
@@ -63,10 +83,15 @@ export default function NewAutomobile({ closeDialog }: NewAutomobileProps) {
             label="Nome"
             className="col-span-3"
           />
-          <TextInput
+          <SelectInput
             control={form.control}
-            name="licensePlate"
-            label="Placa"
+            name="category"
+            label="Categoria"
+            description="Insira a categoria que a rota fará parte"
+            data={categories}
+            keyField="_id"
+            valueField="_id"
+            nameField="name"
             className="col-span-3"
           />
           <div className="col-span-3 flex gap-6 py-4">

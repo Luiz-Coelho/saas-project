@@ -15,16 +15,16 @@ import {
   FormMessage,
   FormDescription,
 } from "@/components/ui/form";
-import { Category } from "@/typing/Category";
-import { Status } from "@/typing/Status";
-import { Track } from "@/typing/Track";
+import { CategoryPopulated } from "@/types/Category";
+import { Status } from "@/types/Status";
+import { TrackPopulated } from "@/types/Track";
 import { Control, FieldValues, Path } from "react-hook-form";
 
 type DropdownFormInputProps<T extends FieldValues> = {
   control: Control<T>;
   name: Path<T>;
   label: string;
-  data: Track[] | Category[] | Status[];
+  data: TrackPopulated[] | CategoryPopulated[] | Status[];
   description?: string;
 };
 
@@ -59,7 +59,7 @@ export default function DropdownFormInput<T extends FieldValues>({
                       : field.onChange([]);
                   }}
                 >
-                  Todas
+                  Selecionar Tudo
                 </DropdownMenuCheckboxItem>
                 {data.map((d) => (
                   <FormItem key={d._id}>

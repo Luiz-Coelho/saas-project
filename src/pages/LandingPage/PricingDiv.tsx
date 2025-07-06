@@ -1,27 +1,24 @@
-import { useEffect, useState } from "react";
 import PricingCard from "./PricingCard";
-import { Category } from "@/typing/Category";
-import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { getCategories } from "@/services/categoriesService";
 
 export default function CarouselDiv() {
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/api/customers")
-      .then((res) => setCategories(res.data))
-      .catch((error) => console.log(error));
-  }, []);
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["categories"],
+    queryFn: getCategories,
+  });
 
   return (
     <div className="grid grid-cols-pricingGrid gap-4 w-4/5 justify-center mx-auto">
-      {categories.map((category) => (
+      {data?.map((category) => (
         <PricingCard
-          key={category.id}
+          key={category._id}
           label={category.name}
           description={category.name}
         />
       ))}
+      {isLoading && <div>Loading...</div>}
+      {isError && <div>{error.message}</div>}
     </div>
   );
 }

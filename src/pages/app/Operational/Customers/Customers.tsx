@@ -8,7 +8,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { DataTable } from "../../../../components/DataTable";
 import { columns } from "./Table/Columns";
 
-import { SearchCustomer } from "@/typing/Customer";
+import { SearchCustomer } from "@/types/Customer";
 import { getCustomers } from "@/services/customerService";
 import { fetchMountCustomerData } from "@/services/mountCustomerService";
 
@@ -16,7 +16,7 @@ export default function Customers() {
   const [searchParams, setSearchParams] = useState<URLSearchParams>();
 
   const { data, isLoading, isError, error } = useQuery({
-    queryKey: ["tracks", "categories"],
+    queryKey: ["tracks", "categories", "statuses"],
     queryFn: fetchMountCustomerData,
   });
 
@@ -57,9 +57,11 @@ export default function Customers() {
   const categories = data?.categories || [];
   const tracks = data?.tracks || [];
 
+  const statuses = data?.statuses || [];
+
   return (
     <div className="space-y-4">
-      <div className="grid grid-flow-col">
+      <div className="grid grid-flow-col py-4">
         <h2 className="self-center">Buscar Cliente(s)</h2>
         <Link
           to={"/app/operational/customers/newcustomer"}
@@ -75,6 +77,7 @@ export default function Customers() {
         onSubmit={handleSearchSubmit}
         categories={categories}
         tracks={tracks}
+        statuses={statuses}
       />
       {isLoadingSearch && <div>Loading...</div>}
       {isSearchError && <div>Error: {searchError.message}</div>}

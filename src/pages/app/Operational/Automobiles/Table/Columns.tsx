@@ -1,10 +1,11 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Category } from "@/typing/Category";
 
 import SortingHeader from "@/components/SortingHeader";
 import SelectHeader from "@/components/SelectHeader";
 import SelectRow from "@/components/SelectRow";
 import ActionsDiv from "@/components/ActionsDiv";
+import UpdateAutomobile from "../UpdateAutomobile";
+import { Category } from "@/types/Category";
 
 type Data = Category;
 
@@ -24,6 +25,14 @@ export const columns: ColumnDef<Data>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <ActionsDiv id={row.original._id} />,
+    cell: ({ row }) => (
+      <ActionsDiv
+        id={row.original._id}
+        title="Editar Automóvel"
+        children={
+          <UpdateAutomobile id={row.original._id} closeDialog={() => {}} />
+        }
+      />
+    ),
   },
 ];
